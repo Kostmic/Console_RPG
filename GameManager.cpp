@@ -11,12 +11,12 @@ void GameManager::startGame() {
 
     std::cout << "Enter number of players:";
     std::cin >> players;
-
+/*
     std::cout << "Enter number of CPUs:";
     std::cin >> autoPlayers;
 
     players += autoPlayers;
-
+    */
     std::cout << std::endl << "Initializing " << players << " players..."<< '\n' << std::endl;
 
 
@@ -72,7 +72,6 @@ void GameManager::run() {
     std::string turnAction;
 
     int roundCounter = 1;
-    int action;
     int target;
     int damage;
     char newGame;
@@ -81,26 +80,23 @@ void GameManager::run() {
         std::cout << "Round " << roundCounter << " - player stats:" << std::endl;
         GameManager::printStats();
 
-        for (int j = 0; j < playerVector.size(); ++j) {
-            std::cout << playerVector.at(j)->getName() << "'s Actions:  (Damage/Cooldown) (Remaining cooldown) " << std::endl;
+        for (j = 0; j < playerVector.size(); ++j) {
+            std::cout << playerVector.at(j)->getName() << "'s Actions:  (Damage|Cooldown) (Remaining cooldown) " << std::endl;
             playerVector.at(j)->getAttacks();
 
             do {
                 std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
                 std::cin >> action;
                 action = action - 1;
-                if (action > playerVector.at(j)->attackVector.size() || action < 0) {
+                if (notValidInput()) {
                     std::cout << "This is not a valid input" << std::endl;
                 }
-                if(playerVector.at(j)->attackVector.at(action)->getCurrentCooldown()>0){
+                if(onCooldown()){
                     std::cout << "This attack is on cooldown!" << std::endl;
                 }
 
-                //Input can't be greater than attack vector size or negative
-            } while (action > playerVector.at(j)->attackVector.size()
-                    || action < 0
-                    || playerVector.at(j)->attackVector.at(action)->getCurrentCooldown()>0
-                    );
+                //Input can't be greater than attack vector size, negative or on cooldown
+            } while (notValidInput()|| onCooldown());
 
             damage = playerVector.at(j)->attackVector.at(action)->getDamage();
             playerVector.at(j)->attackVector.at(action)->setCooldown();
@@ -194,4 +190,12 @@ void GameManager::getTargets(int current) {
 
 bool GameManager::getGameState(){
     return m_newGame;
+}
+
+bool GameManager::onCooldown() {
+    return playerVector.at(j)->attackVector.at(action)->getCurrentCooldown() > 0;
+}
+
+bool GameManager::notValidInput(){
+    return action >= playerVector.at(j)->attackVector.size()||action < 0;
 }

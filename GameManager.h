@@ -12,6 +12,8 @@ public:
     std::vector<PlayerCharacter *> playerVector;
     PlayerCharacter *playerObj;
 
+    int j;
+    int action;
 
     void startGame();
     bool getGameState();
@@ -23,6 +25,8 @@ private:
     void run();
     void printStats();
     void getTargets(int currentPlayer);
+    bool onCooldown();
+    bool notValidInput();
 };
 
 
