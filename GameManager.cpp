@@ -1,6 +1,4 @@
-//
-// Created by Michael Kosther on 29/01/2020.
-//
+
 
 #include <iostream>
 #include "GameManager.h"
@@ -29,11 +27,11 @@ void GameManager::startGame() {
                   << "3.Druid"
                   << std::endl;
         do {
-            std::cout << "Pick player/CPU " << i << "'s class:" << std::endl;
+            std::cout << "Pick player " << i << "'s class:" << std::endl;
             std::cin >> playerClass;
         } while (playerClass < 1 || playerClass > 3);
 
-        std::cout << "Write player/CPU " << i << "'s name:" << std::endl;
+        std::cout << "Write player " << i << "'s name:" << std::endl;
         std::cin.get();
         getline(std::cin, playerName);
 
