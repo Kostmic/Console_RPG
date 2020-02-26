@@ -22,12 +22,19 @@ void PlayerCharacter::getAttacks() {
         << i+1
         << " - "
         << currentAttack->getName()
-        << " (" << currentAttack->getDamage()
-        << "/"
-        << currentAttack->getMaxCooldown()
+        << " ("
+        << currentAttack->getDamage()
+        << "|";
+        if(currentAttack->getMaxCooldown()>0){
+            std::cout << currentAttack->getMaxCooldown();
+        }else{
+            std::cout << "-";
+        }
+
+        std::cout
         <<")";
         if (currentAttack->getMaxCooldown()>0 && currentAttack->getCurrentCooldown() != 0){
-            std::cout << " (" <<  currentAttack->getCurrentCooldown() << " - Turns remaining)";
+            std::cout << " (CD " <<  currentAttack->getCurrentCooldown() << ")";
         }
         std::cout << std::endl;
     }
