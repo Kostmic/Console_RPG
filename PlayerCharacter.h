@@ -1,6 +1,3 @@
-//
-// Created by Michael Kosther on 29/01/2020.
-//
 
 #ifndef RPG_LES02_PLAYERCHARACTER_H
 #define RPG_LES02_PLAYERCHARACTER_H
