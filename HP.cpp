@@ -1,5 +1,13 @@
 #include "HP.h"
-HP HP::operator -= (const HP& h, damage) const{
-    HP result(m_HP-(damage-m_AC), m_AC);
-    return result;
+HP::HP(int hp) {
+    m_maxHP = hp;
+    m_HP = hp;
+    m_AC = 0;
 }
+
+HP::HP(int hp, int ac) {
+    m_maxHP = hp;
+    m_HP = hp;
+    m_AC = ac;
+}
+
