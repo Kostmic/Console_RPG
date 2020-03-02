@@ -58,12 +58,16 @@ void GameManager::run() {
 
                 //Input can't be greater than attack vector size, negative or on cooldown
             } while (notValidInput()|| onCooldown());
+                //CPU picking target, this is done by generating a random number. If attack is on cooldown new number is generated
             }else{
-            std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
-            std::random_device rd;
-            std::mt19937 mt(rd());
-            std::uniform_real_distribution<double> dist(0.0, playerVector.at(j)->attackVector.size());
-            action = dist(mt);
+                std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
+                std::random_device rd;
+                std::mt19937 mt(rd());
+                do{
+                    std::uniform_real_distribution<double> dist(0.0, playerVector.at(j)->attackVector.size());
+                    action = dist(mt);
+                }while(onCooldown());
+                std::cout << action + 1 << std::endl;
             }
 
             damage = playerVector.at(j)->attackVector.at(action)->getDamage();
@@ -79,7 +83,7 @@ void GameManager::run() {
                     std::cin >> target;
                     target = target - 1;
                 }
-                    //Input can't be negative, greater than player array or same as current player number
+                    //Input can't be negative, greater than player array or same as current player number(target yourself)
                 while(target > playerVector.size() || target < 0 || target == j);
             }
             //If it's a cpu we dont need check. Generate a random number
@@ -125,11 +129,11 @@ void GameManager::run() {
             playerObj->decrementCooldowns();
         }
 
-        std::cout << "-------------------" << std::endl;
+        std::cout << "----------------------------------------" << std::endl;
         roundCounter++;
 
     }
-    std::cout << playerVector.at(0)->getName() << " WON!";
+    std::cout << playerVector.at(0)->getName() << " WON!" << std::endl;
     std::cout << "Do you want to play again? [y/n]" << std::endl;
     std::cin >> newGame;
     if (newGame == 121){
