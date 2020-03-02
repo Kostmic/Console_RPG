@@ -92,7 +92,7 @@ void GameManager::run() {
                 std::uniform_real_distribution<double> dist(0.0, playerVector.size());
                 target = dist(mt);
                 }while(target == j);
-                std::cout << target << std::endl;
+                std::cout << target+1 << std::endl;
             }
 
             playerVector.at(target)->hit(damage);
