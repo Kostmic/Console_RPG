@@ -4,19 +4,23 @@
 #define RPG_LES02_GAMEMANAGER_H
 #include <string>
 #include <vector>
-#include "PlayerCharacter.h"
+#include "Character.h"
 
 class GameManager {
 public:
     GameManager(){};
-    std::vector<PlayerCharacter *> playerVector;
-    PlayerCharacter *playerObj;
+    int playerClass;
+    std::string playerName;
 
-    int j;
+    std::vector<Character *> playerVector;
+    Character *playerObj;
+    int target;
     int action;
+    int j;
 
     void startGame();
     bool getGameState();
+    friend class Character;
 
 private:
     int players;
@@ -27,6 +31,8 @@ private:
     void getTargets(int currentPlayer);
     bool onCooldown();
     bool notValidInput();
+    void initializePlayers();
+    void initializeNPCs();
 };
 
 

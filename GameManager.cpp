@@ -3,65 +3,25 @@
 #include <iostream>
 #include "GameManager.h"
 #include <string>
+#include <random>
+#include "Character.h"
+#include "NPCCharacter.h"
 #include "PlayerCharacter.h"
 
 void GameManager::startGame() {
-    int playerClass;
-    std::string playerName;
-
     std::cout << "Enter number of players:";
     std::cin >> players;
-/*
+
     std::cout << "Enter number of CPUs:";
     std::cin >> autoPlayers;
 
-    players += autoPlayers;
-    */
-    std::cout << std::endl << "Initializing " << players << " players..."<< '\n' << std::endl;
+
+    std::cout << std::endl << "Initializing " << players+autoPlayers << " players..."<< '\n' << std::endl;
 
 
-    for (int i = 1; i <= players; ++i) {
-        std::cout << "Player Classes:\n"
-                  << "1.Wizard\n"
-                  << "2.Warrior\n"
-                  << "3.Druid"
-                  << std::endl;
-        do {
-            std::cout << "Pick player " << i << "'s class:" << std::endl;
-            std::cin >> playerClass;
-        } while (playerClass < 1 || playerClass > 3);
-
-        std::cout << "Write player " << i << "'s name:" << std::endl;
-        std::cin.get();
-        getline(std::cin, playerName);
-
-        switch (playerClass) {
-            //Creating a Wizard
-            case 1: {
-                playerObj = new PlayerCharacter(playerName, 250);
-                playerObj->PlayerCharacter::addAttack("Fireball", 20, 0);
-                playerObj->PlayerCharacter::addAttack("Arcane Torrent", 50, 3);
-                break;
-            }
-                //Creating a Warrior
-            case 2: {
-                playerObj = new PlayerCharacter(playerName, 450);
-                playerObj->PlayerCharacter::addAttack("Slash", 15, 0);
-                playerObj->PlayerCharacter::addAttack("Crippling strike", 40, 2);
-                break;
-            }
-                //Creating a Druid
-            case 3: {
-                playerObj = new PlayerCharacter(playerName, 300);
-                playerObj->PlayerCharacter::addAttack("Wrath", 25, 0);
-                playerObj->PlayerCharacter::addAttack("Mighty Bash", 50, 2);
-                break;
-            }
-
-
-        }
-        playerVector.push_back(playerObj);
-
+    GameManager::initializePlayers();
+    if(autoPlayers>0){
+        GameManager::initializeNPCs();
     }
 
     GameManager::run();
@@ -84,7 +44,8 @@ void GameManager::run() {
             std::cout << playerVector.at(j)->getName() << "'s Actions:  (Damage|Cooldown) (Remaining cooldown) " << std::endl;
             playerVector.at(j)->getAttacks();
 
-            do {
+            if (playerVector.at(j)->isPlayer()){
+                do{
                 std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
                 std::cin >> action;
                 action = action - 1;
@@ -97,6 +58,13 @@ void GameManager::run() {
 
                 //Input can't be greater than attack vector size, negative or on cooldown
             } while (notValidInput()|| onCooldown());
+            }else{
+            std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_real_distribution<double> dist(0.0, playerVector.at(j)->attackVector.size());
+            action = dist(mt);
+            }
 
             damage = playerVector.at(j)->attackVector.at(action)->getDamage();
             playerVector.at(j)->attackVector.at(action)->setCooldown();
@@ -104,17 +72,32 @@ void GameManager::run() {
             std::cout << "Targets: " << std::endl;
             GameManager::getTargets(j);
 
-            do{
-                std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
-                std::cin >> target;
+            //if it's a player we want to check input
+            if(playerVector.at(j)->isPlayer()){
+                do{
+                    std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
+                    std::cin >> target;
+                    target = target - 1;
+                }
+                    //Input can't be negative, greater than player array or same as current player number
+                while(target > playerVector.size() || target < 0 || target == j);
             }
-            //Input can't be negative, greater than player array or same as current player number
-            while(target > playerVector.size() || target < 0 || target == j+1);
+            //If it's a cpu we dont need check. Generate a random number
+            else{
+                std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
+                std::random_device rd;
+                std::mt19937 mt(rd());
+                //if cpu generates number to target itself we want to generate a new number
+                do{
+                std::uniform_real_distribution<double> dist(0.0, playerVector.size());
+                target = dist(mt);
+                }while(target == j);
+                std::cout << target << std::endl;
+            }
 
-            target = target - 1;
             playerVector.at(target)->hit(damage);
 
-            turnAction = playerVector.at(j)->runTurn(
+            turnAction = playerVector.at(j)->printTurn(
                     playerVector.at(j)->getName(),
                     playerVector.at(target)->getName(),
                     damage);
@@ -156,6 +139,98 @@ void GameManager::run() {
 }
 
 
+void GameManager::initializePlayers(){
+    for (int i = 1; i <= players; ++i) {
+        std::cout << "Player Classes:\n"
+                  << "1.Wizard\n"
+                  << "2.Warrior\n"
+                  << "3.Druid"
+                  << std::endl;
+        do {
+            std::cout << "Pick player " << i << "'s class:" << std::endl;
+            std::cin >> playerClass;
+        } while (playerClass < 1 || playerClass > 3);
+
+        std::cout << "Write player " << i << "'s name:" << std::endl;
+        std::cin.get();
+        getline(std::cin, playerName);
+
+        switch (playerClass) {
+            //Creating a Wizard
+            case 1: {
+                playerObj = new PlayerCharacter(playerName, 250);
+                playerObj->Character::addAttack("Fireball", 20, 0);
+                playerObj->Character::addAttack("Arcane Torrent", 50, 3);
+                break;
+            }
+                //Creating a Warrior
+            case 2: {
+                playerObj = new PlayerCharacter(playerName, 450, 5);
+                playerObj->Character::addAttack("Slash", 15, 0);
+                playerObj->Character::addAttack("Crippling strike", 40, 2);
+                break;
+            }
+                //Creating a Druid
+            case 3: {
+                playerObj = new PlayerCharacter(playerName, 300, 3);
+                playerObj->Character::addAttack("Wrath", 25, 0);
+                playerObj->Character::addAttack("Mighty Bash", 50, 2);
+                break;
+            }
+
+
+        }
+        playerVector.push_back(playerObj);
+
+    }
+}
+
+void GameManager::initializeNPCs(){
+    for (int i = 1; i <= autoPlayers; ++i) {
+        std::cout << "Player Classes:\n"
+                  << "1.Wizard\n"
+                  << "2.Warrior\n"
+                  << "3.Druid"
+                  << std::endl;
+        do {
+            std::cout << "Pick NPC " << i << "'s class:" << std::endl;
+            std::cin >> playerClass;
+        } while (playerClass < 1 || playerClass > 3);
+
+        std::cout << "Write NPC " << i << "'s name:" << std::endl;
+        std::cin.get();
+        getline(std::cin, playerName);
+
+        switch (playerClass) {
+            //Creating a Wizard
+            case 1: {
+                playerObj = new NPCCharacter(playerName, 250, false);
+                playerObj->Character::addAttack("Fireball", 20, 0);
+                playerObj->Character::addAttack("Arcane Torrent", 50, 3);
+                break;
+            }
+                //Creating a Warrior
+            case 2: {
+                playerObj = new NPCCharacter(playerName, 450, 5, false);
+                playerObj->Character::addAttack("Slash", 15, 0);
+                playerObj->Character::addAttack("Crippling strike", 40, 2);
+                break;
+            }
+                //Creating a Druid
+            case 3: {
+                playerObj = new NPCCharacter(playerName, 300, 3, false);
+                playerObj->Character::addAttack("Wrath", 25, 0);
+                playerObj->Character::addAttack("Mighty Bash", 50, 2);
+                break;
+            }
+
+
+        }
+        playerVector.push_back(playerObj);
+
+    }
+}
+
 void GameManager::printStats() {
     for (int i = 0; i < playerVector.size(); ++i) {
         playerObj = playerVector.at(i);
@@ -167,8 +242,11 @@ void GameManager::printStats() {
                 << playerObj->getCurrentHp()
                 << '/'
                 << playerObj->getMaxHp()
-                << "HP"
-                << std::endl;
+                << "HP";
+                if(playerVector.at(i)->isPlayer() == false){
+                    std::cout << " [CPU]";
+                }
+                std::cout << std::endl;
     }
 }
 
@@ -197,5 +275,5 @@ bool GameManager::onCooldown() {
 }
 
 bool GameManager::notValidInput(){
-    return action >= playerVector.at(j)->attackVector.size()||action < 0;
+    return action > playerVector.at(j)->attackVector.size()||action < 0;
 }
