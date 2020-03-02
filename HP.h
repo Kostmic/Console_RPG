@@ -13,10 +13,10 @@ public:
     HP operator +=(int const &obj);
 
     HP operator += (HP const &obj);
-private:
     int m_HP;
     int m_maxHP;
     int m_AC;
+private:
 
 };
 
