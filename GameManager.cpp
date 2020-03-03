@@ -1,9 +1,8 @@
-
-
 #include <iostream>
-#include "GameManager.h"
 #include <string>
 #include <random>
+
+#include "GameManager.h"
 #include "Character.h"
 #include "NPCCharacter.h"
 #include "PlayerCharacter.h"

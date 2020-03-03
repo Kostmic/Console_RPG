@@ -1,5 +1,3 @@
-
-
 #ifndef CONSOLE_RPG_HP_H
 #define CONSOLE_RPG_HP_H
 

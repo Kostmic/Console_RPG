@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "Attack.h"
 #include "HP.h"

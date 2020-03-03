@@ -1,7 +1,8 @@
 
 #include "Character.h"
 #include <string>
-#include <vector>
+#include <iostream>
+
 
 Character::Character(std::string name, int maxHp, int ac) {
     m_name = name;
@@ -89,6 +90,6 @@ std::string Character::printTurn(std::string currentPlayer, std::string targetPl
     }
 }
 
-bool Character::isPlayer() {
+bool Character::isPlayer(){
     return true;
 }

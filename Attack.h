@@ -6,7 +6,6 @@
 #define RPG_LES02_ATTACK_H
 
 #include <string>
-#include <vector>
 
 class Attack {
 public:

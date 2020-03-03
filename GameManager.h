@@ -1,5 +1,3 @@
-
-
 #ifndef RPG_LES02_GAMEMANAGER_H
 #define RPG_LES02_GAMEMANAGER_H
 

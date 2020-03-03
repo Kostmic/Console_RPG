@@ -1,5 +1,3 @@
-
-
 #ifndef CONSOLE_RPG_PLAYERCHARACTER_H
 #define CONSOLE_RPG_PLAYERCHARACTER_H
 
@@ -11,8 +9,6 @@ public:
     PlayerCharacter(std::string name, int maxHp, int ac);
 
     PlayerCharacter(std::string name, int maxHp);
-
-private:
 };
 
 

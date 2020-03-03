@@ -1,4 +1,3 @@
-#include <iostream>
 #include "HP.h"
 
 HP::HP(int hp) {

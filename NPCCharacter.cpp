@@ -1,5 +1,3 @@
-
-
 #include "NPCCharacter.h"
 
 NPCCharacter::NPCCharacter(std::string name, int maxHp, int ac, bool isPlayer) : Character{name, maxHp, ac} {
@@ -13,4 +11,3 @@ NPCCharacter::NPCCharacter(std::string name, int maxHp, bool isPlayer) : Charact
 bool NPCCharacter::isPlayer() {
     return m_isPlayer;
 }
-
