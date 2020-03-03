@@ -1,7 +1,3 @@
-//
-// Created by Michael Kosther on 29/01/2020.
-//
-
 #include "Attack.h"
 #include <string>
 
