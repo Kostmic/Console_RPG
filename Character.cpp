@@ -13,67 +13,82 @@ Character::Character(std::string name, int maxHp) {
     playerHP = new HP(maxHp);
 }
 
-void Character::addAttack(std::string name, int damage, int cooldown){
+void Character::addAttack(std::string name, int damage, int cooldown) {
     attackObj = new Attack(name, damage, cooldown);
     attackVector.push_back(attackObj);
 }
 
 void Character::getAttacks() {
     for (int i = 0; i < attackVector.size(); ++i) {
-        Attack* currentAttack = attackVector.at(i);
+        Attack *currentAttack = attackVector.at(i);
         std::cout
-        << "  "
-        << i+1
-        << " - "
-        << currentAttack->getName()
-        << " ("
-        << currentAttack->getDamage()
-        << "|";
-        if(currentAttack->getMaxCooldown()>0){
+                << "  "
+                << i + 1
+                << " - "
+                << currentAttack->getName()
+                << " (";
+        if (currentAttack->getDamage() < 0) {
+            std::cout << "+" << currentAttack->getDamage() * -1;
+        } else {
+            std::cout
+                    << currentAttack->getDamage();
+        }
+        std::cout
+                << "|";
+        if (currentAttack->getMaxCooldown() > 0) {
             std::cout << currentAttack->getMaxCooldown();
-        }else{
+        } else {
             std::cout << "-";
         }
 
         std::cout
-        <<")";
-        if (currentAttack->getMaxCooldown()>0 && currentAttack->getCurrentCooldown() != 0){
-            std::cout << " (CD " <<  currentAttack->getCurrentCooldown() << ")";
+                << ")";
+        if (currentAttack->getMaxCooldown() > 0 && currentAttack->getCurrentCooldown() != 0) {
+            std::cout << " (CD " << currentAttack->getCurrentCooldown() << ")";
         }
         std::cout << std::endl;
     }
 }
 
 int Character::getMaxHp() {
-    return playerHP->m_maxHP;
+    return playerHP->getMaxHp();
 }
 
 int Character::getCurrentHp() {
-    return playerHP->m_HP;
+    return playerHP->getCurrentHp();
 }
 
-std::string  Character:: getName() {
+std::string Character::getName() {
     return m_name;
 }
 
-void Character::hit(int damage) {
-   playerHP->m_HP -= damage;
-
+int Character::hit(int damage) {
+    if (damage < 0) {
+        *playerHP += damage;
+    } else {
+        *playerHP -= damage;
+    }
+    return damage;
 }
 
-void Character::decrementCooldowns(){
+void Character::decrementCooldowns() {
     for (int i = 0; i < attackVector.size(); ++i) {
         attackObj = attackVector.at(i);
-        if(attackObj->getCurrentCooldown() > 0){
+        if (attackObj->getCurrentCooldown() > 0) {
             attackObj->decrementCooldown();
         }
     }
 }
 
+//We need to multiply our heal by -1 to print it as a positive value. if statement checks for negative values, since heals are negative
 std::string Character::printTurn(std::string currentPlayer, std::string targetPlayer, int damage) {
-    return currentPlayer+ " attacked " + targetPlayer + " for " + std::to_string(damage)+ " damage";
+    if (damage > 0) {
+        return currentPlayer + " attacked " + targetPlayer + " for " + std::to_string(damage) + " damage";
+    } else {
+        return currentPlayer + " healed " + targetPlayer + " for " + std::to_string(damage * -1) + " health";
+    }
 }
 
-bool Character::isPlayer(){
+bool Character::isPlayer() {
     return true;
 }

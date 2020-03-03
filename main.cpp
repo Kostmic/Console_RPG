@@ -1,4 +1,5 @@
 #include "GameManager.h"
+
 int main() {
     while (true) {
         GameManager game;

@@ -7,16 +7,22 @@
 class HP {
 public:
     HP(int HP);
+
     HP(int hp, int ac);
 
+    int getCurrentHp();
 
-    HP operator +=(int const &obj);
+    int getMaxHp();
 
-    HP operator += (HP const &obj);
+
+    HP operator-=(int &damage);
+
+    HP operator+=(int &damage);
+
+private:
     int m_HP;
     int m_maxHP;
     int m_AC;
-private:
 
 };
 

@@ -9,18 +9,26 @@
 #include "PlayerCharacter.h"
 
 void GameManager::startGame() {
-    std::cout << "Enter number of players:";
-    std::cin >> players;
+    do {
+        std::cout << "Enter number of players:";
+        std::cin >> players;
+        if (players > 20) {
+            std::cout << "Do you seriously have this many friends? (20 players max)" << std::endl;
+        }
+    } while (players < 0 || players > 20);
+    do {
+        std::cout << "Enter number of CPUs:";
+        std::cin >> autoPlayers;
+        if (players > 20) {
+            std::cout << "Why would you ever need this many CPUs? (20 CPUs max";
+        }
+    } while (players < 0 || players > 20);
 
-    std::cout << "Enter number of CPUs:";
-    std::cin >> autoPlayers;
-
-
-    std::cout << std::endl << "Initializing " << players+autoPlayers << " players..."<< '\n' << std::endl;
+    std::cout << std::endl << "Initializing " << players + autoPlayers << " players..." << '\n' << std::endl;
 
 
     GameManager::initializePlayers();
-    if(autoPlayers>0){
+    if (autoPlayers > 0) {
         GameManager::initializeNPCs();
     }
 
@@ -41,32 +49,33 @@ void GameManager::run() {
         GameManager::printStats();
 
         for (j = 0; j < playerVector.size(); ++j) {
-            std::cout << playerVector.at(j)->getName() << "'s Actions:  (Damage|Cooldown) (Remaining cooldown) " << std::endl;
+            std::cout << playerVector.at(j)->getName() << "'s Actions:  (Damage|Cooldown) (Remaining cooldown) "
+                      << std::endl;
             playerVector.at(j)->getAttacks();
 
-            if (playerVector.at(j)->isPlayer()){
-                do{
-                std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
-                std::cin >> action;
-                action = action - 1;
-                if (notValidInput()) {
-                    std::cout << "This is not a valid input" << std::endl;
-                }
-                if(onCooldown()){
-                    std::cout << "This attack is on cooldown!" << std::endl;
-                }
+            if (playerVector.at(j)->isPlayer()) {
+                do {
+                    std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
+                    std::cin >> action;
+                    action = action - 1;
+                    if (notValidInput()) {
+                        std::cout << "This is not a valid input" << std::endl;
+                    }
+                    if (onCooldown()) {
+                        std::cout << "This attack is on cooldown!" << std::endl;
+                    }
 
-                //Input can't be greater than attack vector size, negative or on cooldown
-            } while (notValidInput()|| onCooldown());
+                    //Input can't be greater than attack vector size, negative or on cooldown
+                } while (notValidInput() || onCooldown());
                 //CPU picking target, this is done by generating a random number. If attack is on cooldown new number is generated
-            }else{
+            } else {
                 std::cout << playerVector.at(j)->getName() << ", pick your action:" << std::endl;
                 std::random_device rd;
                 std::mt19937 mt(rd());
-                do{
+                do {
                     std::uniform_real_distribution<double> dist(0.0, playerVector.at(j)->attackVector.size());
                     action = dist(mt);
-                }while(onCooldown());
+                } while (onCooldown());
                 std::cout << action + 1 << std::endl;
             }
 
@@ -74,32 +83,45 @@ void GameManager::run() {
             playerVector.at(j)->attackVector.at(action)->setCooldown();
 
             std::cout << "Targets: " << std::endl;
-            GameManager::getTargets(j);
+            //If it's a heal we only want to print the current player as a target
+            if (damage < 0) {
+                playerObj = playerVector.at(j);
+                std::cout
+                        << " "
+                        << j + 1
+                        << " - "
+                        << playerObj->getName()
+                        << std::endl;;
+            } else {
+                GameManager::getTargets(j);
+            }
 
             //if it's a player we want to check input
-            if(playerVector.at(j)->isPlayer()){
-                do{
+            if (playerVector.at(j)->isPlayer()) {
+                do {
                     std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
                     std::cin >> target;
                     target = target - 1;
                 }
                     //Input can't be negative, greater than player array or same as current player number(target yourself)
-                while(target > playerVector.size() || target < 0 || target == j);
+                    //if damage < 0 (heal) we only want to be able to target ourself
+                while ((damage > 0 && (target > playerVector.size() || target < 0 || target == j)) ||
+                       (damage < 0 && target != j));
             }
-            //If it's a cpu we dont need check. Generate a random number
-            else{
+                //If it's a cpu we dont need check. Generate a random number
+            else {
                 std::cout << playerVector.at(j)->getName() << ", pick your target:" << std::endl;
                 std::random_device rd;
                 std::mt19937 mt(rd());
-                //if cpu generates number to target itself we want to generate a new number
-                do{
-                std::uniform_real_distribution<double> dist(0.0, playerVector.size());
-                target = dist(mt);
-                }while(target == j);
-                std::cout << target+1 << std::endl;
+                //if cpu generates number to target itself we want to generate a new number(if it isn't a heal)
+                do {
+                    std::uniform_real_distribution<double> dist(0.0, playerVector.size());
+                    target = dist(mt);
+                } while ((damage > 0 && target == j) || (damage < 0 && target != j));
+                std::cout << target + 1 << std::endl;
             }
 
-            playerVector.at(target)->hit(damage);
+            damage = playerVector.at(target)->hit(damage);
 
             turnAction = playerVector.at(j)->printTurn(
                     playerVector.at(j)->getName(),
@@ -136,14 +158,14 @@ void GameManager::run() {
     std::cout << playerVector.at(0)->getName() << " WON!" << std::endl;
     std::cout << "Do you want to play again? [y/n]" << std::endl;
     std::cin >> newGame;
-    if (newGame == 121){
+    if (newGame == 121) {
         m_newGame = true;
         playerVector.clear();
     }
 }
 
 
-void GameManager::initializePlayers(){
+void GameManager::initializePlayers() {
     for (int i = 1; i <= players; ++i) {
         std::cout << "Player Classes:\n"
                   << "1.Wizard\n"
@@ -169,16 +191,17 @@ void GameManager::initializePlayers(){
             }
                 //Creating a Warrior
             case 2: {
-                playerObj = new PlayerCharacter(playerName, 450, 5);
+                playerObj = new PlayerCharacter(playerName, 450, 3);
                 playerObj->Character::addAttack("Slash", 15, 0);
                 playerObj->Character::addAttack("Crippling strike", 40, 2);
                 break;
             }
                 //Creating a Druid
             case 3: {
-                playerObj = new PlayerCharacter(playerName, 300, 3);
+                playerObj = new PlayerCharacter(playerName, 300, 0);
                 playerObj->Character::addAttack("Wrath", 25, 0);
                 playerObj->Character::addAttack("Mighty Bash", 50, 2);
+                playerObj->Character::addAttack("Healing Touch", -15, 0);
                 break;
             }
 
@@ -189,7 +212,7 @@ void GameManager::initializePlayers(){
     }
 }
 
-void GameManager::initializeNPCs(){
+void GameManager::initializeNPCs() {
     for (int i = 1; i <= autoPlayers; ++i) {
         std::cout << "Player Classes:\n"
                   << "1.Wizard\n"
@@ -209,22 +232,23 @@ void GameManager::initializeNPCs(){
             //Creating a Wizard
             case 1: {
                 playerObj = new NPCCharacter(playerName, 250, false);
-                playerObj->Character::addAttack("Fireball", 20, 0);
-                playerObj->Character::addAttack("Arcane Torrent", 50, 3);
+                playerObj->NPCCharacter::addAttack("Fireball", 20, 0);
+                playerObj->NPCCharacter::addAttack("Arcane Torrent", 50, 3);
                 break;
             }
                 //Creating a Warrior
             case 2: {
                 playerObj = new NPCCharacter(playerName, 450, 5, false);
-                playerObj->Character::addAttack("Slash", 15, 0);
-                playerObj->Character::addAttack("Crippling strike", 40, 2);
+                playerObj->NPCCharacter::addAttack("Slash", 15, 0);
+                playerObj->NPCCharacter::addAttack("Crippling strike", 40, 2);
                 break;
             }
                 //Creating a Druid
             case 3: {
-                playerObj = new NPCCharacter(playerName, 300, 3, false);
-                playerObj->Character::addAttack("Wrath", 25, 0);
-                playerObj->Character::addAttack("Mighty Bash", 50, 2);
+                playerObj = new NPCCharacter(playerName, 300, 0, false);
+                playerObj->NPCCharacter::addAttack("Wrath", 25, 0);
+                playerObj->NPCCharacter::addAttack("Mighty Bash", 50, 2);
+                playerObj->Character::addAttack("Healing Touch", -15, 0);
                 break;
             }
 
@@ -247,10 +271,10 @@ void GameManager::printStats() {
                 << '/'
                 << playerObj->getMaxHp()
                 << "HP";
-                if(playerVector.at(i)->isPlayer() == false){
-                    std::cout << " [CPU]";
-                }
-                std::cout << std::endl;
+        if (playerVector.at(i)->isPlayer() == false) {
+            std::cout << " [CPU]";
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -270,7 +294,8 @@ void GameManager::getTargets(int current) {
     }
 }
 
-bool GameManager::getGameState(){
+
+bool GameManager::getGameState() {
     return m_newGame;
 }
 
@@ -278,6 +303,6 @@ bool GameManager::onCooldown() {
     return playerVector.at(j)->attackVector.at(action)->getCurrentCooldown() > 0;
 }
 
-bool GameManager::notValidInput(){
-    return action > playerVector.at(j)->attackVector.size()||action < 0;
+bool GameManager::notValidInput() {
+    return action > playerVector.at(j)->attackVector.size() || action < 0;
 }
