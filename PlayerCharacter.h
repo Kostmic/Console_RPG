@@ -6,9 +6,10 @@
 
 #include "Character.h"
 
-class PlayerCharacter : public Character{
+class PlayerCharacter : public Character {
 public:
     PlayerCharacter(std::string name, int maxHp, int ac);
+
     PlayerCharacter(std::string name, int maxHp);
 
 private:

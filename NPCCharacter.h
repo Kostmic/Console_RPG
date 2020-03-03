@@ -7,11 +7,14 @@
 #include <string>
 #include "Character.h"
 
-class NPCCharacter : public Character{
+class NPCCharacter : public Character {
 public:
     NPCCharacter(std::string name, int maxHp, int ac, bool isPlayer);
+
     NPCCharacter(std::string name, int maxHp, bool isPlayer);
-     bool isPlayer() override;
+
+    bool isPlayer() override;
+
 private:
     bool m_isPlayer;
 };

@@ -6,11 +6,11 @@ NPCCharacter::NPCCharacter(std::string name, int maxHp, int ac, bool isPlayer) :
     m_isPlayer = isPlayer;
 }
 
-NPCCharacter::NPCCharacter(std::string name, int maxHp, bool isPlayer) : Character{name, maxHp}{
+NPCCharacter::NPCCharacter(std::string name, int maxHp, bool isPlayer) : Character{name, maxHp} {
     m_isPlayer = isPlayer;
 }
 
-bool NPCCharacter::isPlayer(){
+bool NPCCharacter::isPlayer() {
     return m_isPlayer;
 }
 
