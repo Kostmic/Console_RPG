@@ -18,10 +18,10 @@ void GameManager::startGame() {
     do {
         std::cout << "Enter number of CPUs:";
         std::cin >> autoPlayers;
-        if (players > 20) {
-            std::cout << "Why would you ever need this many CPUs? (20 CPUs max";
+        if (autoPlayers > 20) {
+            std::cout << "Why would you ever need this many CPUs? (20 CPUs max)" << std::endl;
         }
-    } while (players < 0 || players > 20);
+    } while (autoPlayers < 0 || autoPlayers > 20);
 
     std::cout << std::endl << "Initializing " << players + autoPlayers << " players..." << '\n' << std::endl;
 
